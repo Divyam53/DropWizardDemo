@@ -14,11 +14,16 @@ import javax.ws.rs.core.Response.Status;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
+import org.jose4j.lang.JoseException;
 
 import com.codahale.metrics.annotation.Timed;
 
+import io.dropwizard.auth.Auth;
+import io.dropwizard.auth.PrincipalImpl;
+import io.dropwizard.jersey.caching.CacheControl;
 import test.divyam.ePayLaterTest.apis.utils.Helper;
 import test.divyam.ePayLaterTest.apis.utils.JWTGenerator;
+import test.divyam.ePayLaterTest.apis.utils.ResponseEntity;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,23 +31,29 @@ import test.divyam.ePayLaterTest.apis.utils.JWTGenerator;
 public class LoginController {
 	public static final byte[] JWT_SECRET_KEY = "dfwzsdzwh823zebdwdz772632gdsbd3333".getBytes();
 
+
 	@GET
 	@Path("/{id}")
-	public JsonWebSignature getEmployeeById(@PathParam("id") String id) {
-		//if (Helper.isValidId(id)) {
-			final JwtClaims claims = new JwtClaims();
-			//claims.setSubject("1");
-			////claims.setStringClaim("roles", "user");
-			claims.setStringClaim("user", id);
-			claims.setIssuedAtToNow();
-			claims.setGeneratedJwtId();
+	@CacheControl(noCache = true, noStore = true, mustRevalidate = true, maxAge = 0)
+	public final ResponseEntity doLogin(@Auth PrincipalImpl user) throws JoseException {
+		return new ResponseEntity(buildToken(user).getCompactSerialization());
+	}
 
-			final JsonWebSignature jws = new JsonWebSignature();
-			jws.setPayload(claims.toString());
-			jws.setAlgorithmHeaderValue(HMAC_SHA256);
-			jws.setKey(new HmacKey(JWT_SECRET_KEY));
-			return jws;
-			//return Response.ok(authToken).build();
+	public JsonWebSignature buildToken(@PathParam("id") PrincipalImpl user) {
+		//if (Helper.isValidId(id)) {
+		final JwtClaims claims = new JwtClaims();
+		claims.setSubject("1");
+		////claims.setStringClaim("roles", "user");
+		claims.setStringClaim("user", user.getName());
+		claims.setIssuedAtToNow();
+		claims.setGeneratedJwtId();
+
+		final JsonWebSignature jws = new JsonWebSignature();
+		jws.setPayload(claims.toString());
+		jws.setAlgorithmHeaderValue(HMAC_SHA256);
+		jws.setKey(new HmacKey(JWT_SECRET_KEY));
+		return jws;
+		//return Response.ok(authToken).build();
 		//}
 		//return Response.status(Status.NOT_FOUND).build();
 	}
