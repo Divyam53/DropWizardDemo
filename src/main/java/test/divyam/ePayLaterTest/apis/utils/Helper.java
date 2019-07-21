@@ -15,9 +15,11 @@ public class Helper {
 		return phoneNo;
 	}
 	
-	
-	public static boolean isValidId(String phoneNo) {
-		return true;
+
+	public static boolean isValidToken(String validToken, String token) {
+		if(validToken.contentEquals(token))
+			return true;
+		return false;
 	}
 
 }
