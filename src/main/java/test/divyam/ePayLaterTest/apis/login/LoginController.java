@@ -35,19 +35,19 @@ public class LoginController {
 	@GET
 	@Path("/{id}")
 	@CacheControl(noCache = true, noStore = true, mustRevalidate = true, maxAge = 0)
-	public final ResponseEntity doLogin(@Auth PrincipalImpl user) throws JoseException {
-		return new ResponseEntity(buildToken(user).getCompactSerialization());
+	public final ResponseEntity doLogin(@PathParam("id") String id) throws JoseException {
+		return new ResponseEntity(buildToken(id).getCompactSerialization());
 	}
 
-	public JsonWebSignature buildToken(@PathParam("id") PrincipalImpl user) {
+	public JsonWebSignature buildToken(@PathParam("id") String id) {
 		//if (Helper.isValidId(id)) {
 		final JwtClaims claims = new JwtClaims();
-		claims.setSubject("1");
+		//claims.setSubject("1");
 		////claims.setStringClaim("roles", "user");
-		claims.setStringClaim("user", user.getName());
+		claims.setStringClaim("user", id);
 		claims.setIssuedAtToNow();
 		claims.setGeneratedJwtId();
-
+		System.out.println(id);
 		final JsonWebSignature jws = new JsonWebSignature();
 		jws.setPayload(claims.toString());
 		jws.setAlgorithmHeaderValue(HMAC_SHA256);

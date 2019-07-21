@@ -27,13 +27,14 @@ public class UserApplication extends Application<UserConfiguration> {
 	@Override
 	public void run(UserConfiguration configuration, Environment environment) throws Exception {
 		environment.jersey().register(new LoginController());
+		environment.jersey().register(new SpendController());
 
 		AuthFilterUtils authFilterUtils = new AuthFilterUtils();
-		final AuthFilter<BasicCredentials, PrincipalImpl> basicFilter = authFilterUtils.buildBasicAuthFilter();
+		//final AuthFilter<BasicCredentials, PrincipalImpl> basicFilter = authFilterUtils.buildBasicAuthFilter();
 		final AuthFilter<JwtContext, MyUser> jwtFilter = authFilterUtils.buildJwtAuthFilter();
 
-		final PolymorphicAuthDynamicFeature feature = new PolymorphicAuthDynamicFeature<>(
-				ImmutableMap.of(PrincipalImpl.class, basicFilter, MyUser.class, jwtFilter));
+		final PolymorphicAuthDynamicFeature<MyUser> feature = new PolymorphicAuthDynamicFeature<>(
+				ImmutableMap.of(MyUser.class, jwtFilter));
 		final AbstractBinder binder = new PolymorphicAuthValueFactoryProvider.Binder<>(
 				ImmutableSet.of(PrincipalImpl.class, MyUser.class));
 

@@ -26,8 +26,7 @@ public class JWTAuthenticator implements Authenticator<JwtContext, MyUser> {
 	public Optional<MyUser> authenticate(JwtContext context) {
 		try {
 			JwtClaims claims = context.getJwtClaims();
-
-			int id = Integer.parseInt(claims.getSubject());
+			
 			String username = (String) claims.getClaimValue("user");
 			//String roles = (String) claims.getClaimValue("roles");
 
