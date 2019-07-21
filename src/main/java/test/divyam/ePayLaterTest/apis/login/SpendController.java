@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.lang.JoseException;
 
 import io.dropwizard.auth.Auth;
 import test.divyam.ePayLaterTest.apis.utils.AuthService;
@@ -24,9 +25,9 @@ public class SpendController {
 	
 	@GET
 	@Path("/{id}")
-	public JsonWebSignature getSpend(@PathParam("id") String id) {
+	public String getSpend(@PathParam("id") String id) throws JoseException {
 		AuthService service = AuthService.getInstance();
-		return service.getValue(id);
+		return service.getValue(id).getCompactSerialization();
 	}
 
 }
