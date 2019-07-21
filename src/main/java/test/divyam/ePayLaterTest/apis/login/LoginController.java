@@ -21,6 +21,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.auth.PrincipalImpl;
 import io.dropwizard.jersey.caching.CacheControl;
+import test.divyam.ePayLaterTest.apis.utils.AuthService;
 import test.divyam.ePayLaterTest.apis.utils.Helper;
 import test.divyam.ePayLaterTest.apis.utils.ResponseEntity;
 
@@ -31,19 +32,21 @@ public class LoginController {
 	public static final byte[] JWT_SECRET_KEY = "dfwzsdzwh823zebdwdz772632gdsbd3333".getBytes();
 
 
+	private String id;
 	@GET
 	@Path("/{id}")
 	@CacheControl(noCache = true, noStore = true, mustRevalidate = true, maxAge = 0)
-	public final ResponseEntity doLogin(@Auth PrincipalImpl user) throws JoseException {
-		return new ResponseEntity(buildToken(user).getCompactSerialization());
+	public final ResponseEntity doLogin(@PathParam("id") String id) throws JoseException {
+		this.id = id;
+		return new ResponseEntity(buildToken(id).getCompactSerialization());
 	}
 
-	public JsonWebSignature buildToken(PrincipalImpl user) {
+	public JsonWebSignature buildToken(String id) {
 		//if (Helper.isValidId(id)) {
 		final JwtClaims claims = new JwtClaims();
 		//claims.setSubject("1");
 		////claims.setStringClaim("roles", "user");
-		claims.setStringClaim("user", user.getName());
+		claims.setStringClaim("user", id);
 		claims.setIssuedAtToNow();
 		claims.setGeneratedJwtId();
 		//System.out.println(id);
@@ -51,6 +54,8 @@ public class LoginController {
 		jws.setPayload(claims.toString());
 		jws.setAlgorithmHeaderValue(HMAC_SHA256);
 		jws.setKey(new HmacKey(JWT_SECRET_KEY));
+		AuthService service = AuthService.getInstance();
+		service.addKey(id, jws);
 		return jws;
 	}
 

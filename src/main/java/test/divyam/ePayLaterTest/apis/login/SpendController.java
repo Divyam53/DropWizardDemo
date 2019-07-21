@@ -9,7 +9,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.jose4j.jws.JsonWebSignature;
+
 import io.dropwizard.auth.Auth;
+import test.divyam.ePayLaterTest.apis.utils.AuthService;
 import test.divyam.ePayLaterTest.apis.utils.ProtectedResourceResponse;
 
 @Path("/spend")
@@ -20,8 +23,10 @@ import test.divyam.ePayLaterTest.apis.utils.ProtectedResourceResponse;
 public class SpendController {
 	
 	@GET
-	public ProtectedResourceResponse getSpend(@Auth MyUser user) {
-		return new ProtectedResourceResponse(user.getName());
+	@Path("/{id}")
+	public JsonWebSignature getSpend(@PathParam("id") String id) {
+		AuthService service = AuthService.getInstance();
+		return service.getValue(id);
 	}
 
 }
