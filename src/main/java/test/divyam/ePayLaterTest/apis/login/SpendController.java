@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.dropwizard.auth.Auth;
+import test.divyam.ePayLaterTest.apis.utils.ProtectedResourceResponse;
 
 @Path("/spend")
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,9 +20,8 @@ import io.dropwizard.auth.Auth;
 public class SpendController {
 	
 	@GET
-	@Path("/{id}")
-	public String getSpend(@Auth @PathParam("id") String id) {
-		return "fdsjhl";
+	public ProtectedResourceResponse getSpend(@Auth MyUser user) {
+		return new ProtectedResourceResponse(user.getName());
 	}
 
 }

@@ -30,11 +30,11 @@ public class UserApplication extends Application<UserConfiguration> {
 		environment.jersey().register(new SpendController());
 
 		AuthFilterUtils authFilterUtils = new AuthFilterUtils();
-		//final AuthFilter<BasicCredentials, PrincipalImpl> basicFilter = authFilterUtils.buildBasicAuthFilter();
+		final AuthFilter<BasicCredentials, PrincipalImpl> basicFilter = authFilterUtils.buildBasicAuthFilter();
 		final AuthFilter<JwtContext, MyUser> jwtFilter = authFilterUtils.buildJwtAuthFilter();
 
-		final PolymorphicAuthDynamicFeature<MyUser> feature = new PolymorphicAuthDynamicFeature<>(
-				ImmutableMap.of(MyUser.class, jwtFilter));
+		final PolymorphicAuthDynamicFeature feature = new PolymorphicAuthDynamicFeature<>(
+				ImmutableMap.of(PrincipalImpl.class, basicFilter, MyUser.class, jwtFilter));
 		final AbstractBinder binder = new PolymorphicAuthValueFactoryProvider.Binder<>(
 				ImmutableSet.of(PrincipalImpl.class, MyUser.class));
 

@@ -23,7 +23,7 @@ public class JWTAuthenticator implements Authenticator<JwtContext, MyUser> {
 	 * All JsonWebTokenExceptions will result in a 401 Unauthorized response.
 	 */
 	@Override
-	public Optional<MyUser> authenticate(JwtContext context) {
+	public Optional<MyUser> authenticate(JwtContext context)  {
 		try {
 			JwtClaims claims = context.getJwtClaims();
 			

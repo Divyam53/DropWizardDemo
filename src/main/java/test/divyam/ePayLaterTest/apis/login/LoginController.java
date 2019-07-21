@@ -22,7 +22,6 @@ import io.dropwizard.auth.Auth;
 import io.dropwizard.auth.PrincipalImpl;
 import io.dropwizard.jersey.caching.CacheControl;
 import test.divyam.ePayLaterTest.apis.utils.Helper;
-import test.divyam.ePayLaterTest.apis.utils.JWTGenerator;
 import test.divyam.ePayLaterTest.apis.utils.ResponseEntity;
 
 @Path("/login")
@@ -35,27 +34,24 @@ public class LoginController {
 	@GET
 	@Path("/{id}")
 	@CacheControl(noCache = true, noStore = true, mustRevalidate = true, maxAge = 0)
-	public final ResponseEntity doLogin(@PathParam("id") String id) throws JoseException {
-		return new ResponseEntity(buildToken(id).getCompactSerialization());
+	public final ResponseEntity doLogin(@Auth PrincipalImpl user) throws JoseException {
+		return new ResponseEntity(buildToken(user).getCompactSerialization());
 	}
 
-	public JsonWebSignature buildToken(@PathParam("id") String id) {
+	public JsonWebSignature buildToken(PrincipalImpl user) {
 		//if (Helper.isValidId(id)) {
 		final JwtClaims claims = new JwtClaims();
 		//claims.setSubject("1");
 		////claims.setStringClaim("roles", "user");
-		claims.setStringClaim("user", id);
+		claims.setStringClaim("user", user.getName());
 		claims.setIssuedAtToNow();
 		claims.setGeneratedJwtId();
-		System.out.println(id);
+		//System.out.println(id);
 		final JsonWebSignature jws = new JsonWebSignature();
 		jws.setPayload(claims.toString());
 		jws.setAlgorithmHeaderValue(HMAC_SHA256);
 		jws.setKey(new HmacKey(JWT_SECRET_KEY));
 		return jws;
-		//return Response.ok(authToken).build();
-		//}
-		//return Response.status(Status.NOT_FOUND).build();
 	}
 
 }
